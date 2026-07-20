@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Menu;
+use App\Models\MenuItem;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
 return [
@@ -127,10 +130,16 @@ return [
     |
     | This value determines the classes that can be unserialized from cache
     | storage. By default, no PHP classes will be unserialized from your
-    | cache to prevent gadget chain attacks if your APP_KEY is leaked.
+    | cache to prevent gadget chain attacks if your APP_KEY is leaked. The
+    | menu cache (see App\Services\MenuService) stores Eloquent models, so
+    | the exact classes in that object graph are allow-listed below.
     |
     */
 
-    'serializable_classes' => false,
+    'serializable_classes' => [
+        Menu::class,
+        MenuItem::class,
+        Collection::class,
+    ],
 
 ];
