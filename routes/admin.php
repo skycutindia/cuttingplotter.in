@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LeadController;
+use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\ProductController;
@@ -36,6 +37,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('menus/{menu}/reorder', [MenuController::class, 'reorderItems'])->name('menus.reorder');
 
     Route::resource('banners', BannerController::class)->except(['show']);
+
+    Route::get('media', [MediaController::class, 'index'])->name('media.index');
+    Route::post('media', [MediaController::class, 'store'])->name('media.store');
+    Route::put('media/{medium}', [MediaController::class, 'update'])->name('media.update');
+    Route::post('media/{medium}/replace', [MediaController::class, 'replace'])->name('media.replace');
+    Route::delete('media/{medium}', [MediaController::class, 'destroy'])->name('media.destroy');
+    Route::delete('media-bulk', [MediaController::class, 'destroyBulk'])->name('media.bulk-destroy');
+    Route::post('media/folders', [MediaController::class, 'storeFolder'])->name('media.folders.store');
+    Route::get('media/picker', [MediaController::class, 'picker'])->name('media.picker');
 
     Route::resource('leads', LeadController::class)->only(['index', 'show', 'update', 'destroy']);
 

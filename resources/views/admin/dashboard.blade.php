@@ -37,6 +37,14 @@
             </div>
         </div>
     </div>
+    <div class="col-md-3">
+        <div class="card stat-card p-3">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-info bg-opacity-10 text-info me-3"><i class="bi bi-folder2-open"></i></div>
+                <div><h3 class="mb-0">{{ $stats['media'] }}</h3><small class="text-muted">Media Files</small></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row g-3">
