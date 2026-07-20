@@ -2,6 +2,23 @@
 
 @section('title', ($product->meta_title ?? $product->name).' | '.($settings['site_name'] ?? ''))
 @section('meta_description', $product->meta_description ?? $product->short_description)
+@section('canonical', $product->canonical_url ?? route('products.show', $product->slug))
+@section('og_type', 'product')
+
+@push('schema')
+@php
+    $seo = app(\App\Services\SeoService::class);
+    $productSchema = $seo->productSchema($product);
+    $breadcrumbs = $seo->breadcrumbSchema([
+        ['name' => 'Home', 'url' => route('home')],
+        ['name' => 'Products', 'url' => route('products.index')],
+        ['name' => $product->category?->name ?? 'Product', 'url' => $product->category ? route('products.index', ['category' => $product->category->slug]) : null],
+        ['name' => $product->name, 'url' => route('products.show', $product->slug)],
+    ]);
+@endphp
+<script type="application/ld+json">{!! json_encode($productSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
+<script type="application/ld+json">{!! json_encode($breadcrumbs, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
+@endpush
 
 @section('content')
 <div class="bg-light py-3">

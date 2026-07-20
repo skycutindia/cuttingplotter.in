@@ -94,6 +94,7 @@ class DatabaseSeeder extends Seeder
             'maintenance_mode' => '0',
             'default_meta_title' => 'Cutting Plotter India | Plotters, Printers & Printheads',
             'default_meta_description' => 'Leading supplier of cutting plotters, UV printers, printheads, inks, and spare parts in India. Multi-brand industrial printing equipment.',
+            'robots_txt' => "User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /login\nSitemap: ".url('/sitemap.xml'),
         ];
 
         foreach ($settings as $key => $value) {

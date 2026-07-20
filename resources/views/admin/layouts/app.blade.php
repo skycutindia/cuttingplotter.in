@@ -39,6 +39,7 @@
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.menus.*') ? 'active' : '' }}" href="{{ route('admin.menus.index') }}"><i class="bi bi-list-nested"></i> Menus</a></li>
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}" href="{{ route('admin.banners.index') }}"><i class="bi bi-image"></i> Banners</a></li>
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.media.*') ? 'active' : '' }}" href="{{ route('admin.media.index') }}"><i class="bi bi-folder2-open"></i> Media</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.seo.*') ? 'active' : '' }}" href="{{ route('admin.seo.index') }}"><i class="bi bi-search"></i> SEO</a></li>
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.leads.*') ? 'active' : '' }}" href="{{ route('admin.leads.index') }}"><i class="bi bi-people"></i> Leads</a></li>
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}"><i class="bi bi-gear"></i> Settings</a></li>
             <li class="nav-item mt-3"><a class="nav-link" href="{{ route('home') }}" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>

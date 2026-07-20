@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\ProductBulkController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,4 +59,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+
+    Route::get('seo', [SeoController::class, 'index'])->name('seo.index');
+    Route::put('seo/global', [SeoController::class, 'updateGlobalSeo'])->name('seo.global');
+    Route::put('seo/robots', [SeoController::class, 'updateRobots'])->name('seo.robots');
+    Route::post('seo/redirects', [SeoController::class, 'storeRedirect'])->name('seo.redirects.store');
+    Route::put('seo/redirects/{redirect}', [SeoController::class, 'updateRedirect'])->name('seo.redirects.update');
+    Route::delete('seo/redirects/{redirect}', [SeoController::class, 'destroyRedirect'])->name('seo.redirects.destroy');
+    Route::post('seo/sitemap/clear', [SeoController::class, 'clearSitemapCache'])->name('seo.sitemap.clear');
 });
