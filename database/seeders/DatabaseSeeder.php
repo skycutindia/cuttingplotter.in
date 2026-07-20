@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\HomepageSection;
 use App\Models\Lead;
 use App\Models\Page;
+use App\Models\PageSection;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductSpecification;
@@ -230,7 +231,7 @@ class DatabaseSeeder extends Seeder
 
     protected function seedPages(): void
     {
-        Page::firstOrCreate(
+        $about = Page::firstOrCreate(
             ['slug' => 'about-us'],
             [
                 'title' => 'About Us',
@@ -239,6 +240,42 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
+        if ($about->sections()->count() === 0) {
+            PageSection::create([
+                'page_id' => $about->id,
+                'type' => 'heading',
+                'title' => 'About Heading',
+                'content' => ['text' => 'About Cutting Plotter India', 'subtitle' => 'Your trusted partner for industrial printing equipment', 'tag' => 'h1', 'alignment' => 'center'],
+                'sort_order' => 0,
+            ]);
+            PageSection::create([
+                'page_id' => $about->id,
+                'type' => 'rich_text',
+                'title' => 'About Content',
+                'content' => ['body' => '<p>Cutting Plotter India is a leading supplier of plotters, printers, printheads, inks, and spare parts across India. We represent top global brands including Skycut, Roland, Mimaki, Epson, GCC, and Xaar.</p><p>With years of experience in the signage and printing industry, we provide genuine products, expert technical support, and competitive pricing to businesses of all sizes.</p>', 'container_width' => 'container'],
+                'sort_order' => 1,
+            ]);
+            PageSection::create([
+                'page_id' => $about->id,
+                'type' => 'counter',
+                'title' => 'Stats',
+                'content' => ['items' => [
+                    ['number' => '500', 'suffix' => '+', 'label' => 'Products'],
+                    ['number' => '50', 'suffix' => '+', 'label' => 'Brands'],
+                    ['number' => '1000', 'suffix' => '+', 'label' => 'Happy Clients'],
+                    ['number' => '15', 'suffix' => '+', 'label' => 'Years Experience'],
+                ]],
+                'sort_order' => 2,
+            ]);
+            PageSection::create([
+                'page_id' => $about->id,
+                'type' => 'testimonial',
+                'title' => 'Testimonials',
+                'content' => ['title' => 'What Our Customers Say', 'source' => 'featured'],
+                'sort_order' => 3,
+            ]);
+        }
 
         Page::firstOrCreate(
             ['slug' => 'contact'],
@@ -249,6 +286,24 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
+        $contact = Page::where('slug', 'contact')->first();
+        if ($contact && $contact->sections()->count() === 0) {
+            PageSection::create([
+                'page_id' => $contact->id,
+                'type' => 'heading',
+                'title' => 'Contact Heading',
+                'content' => ['text' => 'Contact Us', 'subtitle' => 'We would love to hear from you', 'tag' => 'h1', 'alignment' => 'center'],
+                'sort_order' => 0,
+            ]);
+            PageSection::create([
+                'page_id' => $contact->id,
+                'type' => 'contact_form',
+                'title' => 'Contact Form',
+                'content' => ['title' => 'Send us a Message', 'subtitle' => 'Fill out the form and we will get back to you within 24 hours.'],
+                'sort_order' => 1,
+            ]);
+        }
     }
 
     protected function seedBlogs(): void

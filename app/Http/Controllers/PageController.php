@@ -9,7 +9,10 @@ class PageController extends Controller
 {
     public function show(string $slug): View
     {
-        $page = Page::where('slug', $slug)->where('is_active', true)->with('sections')->firstOrFail();
+        $page = Page::where('slug', $slug)
+            ->where('is_active', true)
+            ->with(['sections' => fn ($q) => $q->orderBy('sort_order')])
+            ->firstOrFail();
 
         return view('frontend.pages.show', compact('page'));
     }
