@@ -17,9 +17,11 @@ Laravel 13 CMS ("Cutting Plotter India"). PHP 8.3 + Composer, Node 22 (npm), SQL
 ### Admin CMS (the core product)
 - Log in at `/login` with `admin@cuttingplotter.in` / `password`, then use `/admin` (dashboard, products, brands, categories, pages, menus, leads, settings).
 
-### Known pre-existing bugs (NOT environment issues — do not "fix" as part of setup)
-- Post-login redirect throws `Route [dashboard] not defined` (500). Authentication still succeeds; navigate directly to `/admin` afterward. Caused by the Breeze default redirect target being removed in favor of `/admin`.
-- Frontend pages (`/`, `/products`, `/brands`, `/page/{slug}`, etc.) return 500 with `App\Models\Menu ... incomplete object`. `App\Services\MenuService` caches an Eloquent model, which is incompatible with Laravel 13's `config/cache.php` default `'serializable_classes' => false`. The admin panel (`admin.*` views) is unaffected. For local frontend work you can set `CACHE_STORE=array` in `.env` (never commit that), but the real fix is application-level (cache primitives instead of the model, or allowlist the classes).
+### Cache serialization note
+`App\Services\MenuService` caches Eloquent models (`Menu`/`MenuItem`). Laravel 13's `config/cache.php` `'serializable_classes'` therefore allow-lists `Menu`, `MenuItem`, and `Illuminate\Database\Eloquent\Collection` (default was `false`, which broke every `frontend.*` page). If you cache additional model types, add them to that list or they will deserialize to `__PHP_Incomplete_Class`.
+
+### Auth redirect note
+There is no standalone user area: the `dashboard` named route (`routes/web.php`) just forwards admin-capable users to `admin.dashboard` and everyone else to `profile.edit`. Laravel Breeze's auth controllers redirect to `route('dashboard')`, so that route must exist.
 
 ### Testing
 - Tests: `php artisan test` (SQLite `:memory:`). 6 failures are pre-existing Laravel Breeze scaffolding tests that don't match this app (they reference the removed `dashboard` route and the default welcome page); the other 19 pass.
