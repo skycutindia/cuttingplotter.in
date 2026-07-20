@@ -48,11 +48,30 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('products.index') }}">Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('brands.index') }}">Brands</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('blog.index') }}">Blog</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('contact') }}">Contact</a></li>
+                    @if($headerMenu && $headerMenu->items->count())
+                        @foreach($headerMenu->items as $item)
+                        <li class="nav-item {{ $item->children->count() ? 'dropdown' : '' }}">
+                            @if($item->children->count())
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">{{ $item->title }}</a>
+                            <ul class="dropdown-menu">
+                                @foreach($item->children as $child)
+                                <li><a class="dropdown-item" href="{{ $child->url }}" @if($child->target === '_blank') target="_blank" @endif>{{ $child->title }}</a></li>
+                                @endforeach
+                            </ul>
+                            @else
+                            <a class="nav-link" href="{{ $item->url ?? '#' }}" @if($item->target === '_blank') target="_blank" @endif>
+                                @if($item->icon)<i class="bi {{ $item->icon }}"></i> @endif{{ $item->title }}
+                            </a>
+                            @endif
+                        </li>
+                        @endforeach
+                    @else
+                        <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('products.index') }}">Products</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('brands.index') }}">Brands</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('blog.index') }}">Blog</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('contact') }}">Contact</a></li>
+                    @endif
                     @auth
                         @if(auth()->user()->hasAnyRole(['super-admin','admin','content-manager']))
                         <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}"><i class="bi bi-gear"></i> Admin</a></li>
@@ -83,10 +102,16 @@
                 <div class="col-md-4 mb-4">
                     <h6 class="text-white">Quick Links</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{{ route('products.index') }}">Products</a></li>
-                        <li><a href="{{ route('brands.index') }}">Brands</a></li>
-                        <li><a href="{{ route('blog.index') }}">Blog</a></li>
-                        <li><a href="{{ route('contact') }}">Contact</a></li>
+                        @if($footerMenu && $footerMenu->items->count())
+                            @foreach($footerMenu->items as $item)
+                            <li><a href="{{ $item->url }}">{{ $item->title }}</a></li>
+                            @endforeach
+                        @else
+                            <li><a href="{{ route('products.index') }}">Products</a></li>
+                            <li><a href="{{ route('brands.index') }}">Brands</a></li>
+                            <li><a href="{{ route('blog.index') }}">Blog</a></li>
+                            <li><a href="{{ route('contact') }}">Contact</a></li>
+                        @endif
                     </ul>
                 </div>
                 <div class="col-md-4 mb-4">

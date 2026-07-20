@@ -9,6 +9,8 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\HomepageSection;
 use App\Models\Lead;
+use App\Models\Menu;
+use App\Models\MenuItem;
 use App\Models\Page;
 use App\Models\PageSection;
 use App\Models\Product;
@@ -35,6 +37,7 @@ class DatabaseSeeder extends Seeder
         $this->seedPages();
         $this->seedBlogs();
         $this->seedBanners();
+        $this->seedMenus();
         $this->seedTestimonials();
         $this->seedHomepageSections();
         $this->seedSampleLeads();
@@ -342,6 +345,45 @@ class DatabaseSeeder extends Seeder
                 'sort_order' => 0,
             ]
         );
+    }
+
+    protected function seedMenus(): void
+    {
+        $header = Menu::firstOrCreate(
+            ['location' => 'header'],
+            ['name' => 'Header Menu', 'is_active' => true]
+        );
+
+        if ($header->allItems()->count() === 0) {
+            $items = [
+                ['title' => 'Home', 'url' => '/', 'sort_order' => 0],
+                ['title' => 'Products', 'url' => '/products', 'sort_order' => 1],
+                ['title' => 'Brands', 'url' => '/brands', 'sort_order' => 2],
+                ['title' => 'About', 'url' => '/page/about-us', 'sort_order' => 3],
+                ['title' => 'Blog', 'url' => '/blog', 'sort_order' => 4],
+                ['title' => 'Contact', 'url' => '/contact', 'sort_order' => 5],
+            ];
+            foreach ($items as $item) {
+                MenuItem::create(array_merge($item, ['menu_id' => $header->id, 'is_active' => true]));
+            }
+        }
+
+        $footer = Menu::firstOrCreate(
+            ['location' => 'footer'],
+            ['name' => 'Footer Menu', 'is_active' => true]
+        );
+
+        if ($footer->allItems()->count() === 0) {
+            $items = [
+                ['title' => 'Products', 'url' => '/products', 'sort_order' => 0],
+                ['title' => 'Brands', 'url' => '/brands', 'sort_order' => 1],
+                ['title' => 'About Us', 'url' => '/page/about-us', 'sort_order' => 2],
+                ['title' => 'Contact', 'url' => '/contact', 'sort_order' => 3],
+            ];
+            foreach ($items as $item) {
+                MenuItem::create(array_merge($item, ['menu_id' => $footer->id, 'is_active' => true]));
+            }
+        }
     }
 
     protected function seedTestimonials(): void

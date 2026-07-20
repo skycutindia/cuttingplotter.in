@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LeadController;
+use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SettingController;
@@ -25,6 +27,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('pages/{page}/sections/{section}/duplicate', [PageController::class, 'duplicateSection'])->name('pages.sections.duplicate');
     Route::post('pages/{page}/sections/reorder', [PageController::class, 'reorderSections'])->name('pages.sections.reorder');
     Route::post('pages/{page}/sections/{section}/toggle', [PageController::class, 'toggleSection'])->name('pages.sections.toggle');
+
+    Route::get('menus', [MenuController::class, 'index'])->name('menus.index');
+    Route::get('menus/{menu}/edit', [MenuController::class, 'edit'])->name('menus.edit');
+    Route::post('menus/{menu}/items', [MenuController::class, 'storeItem'])->name('menus.items.store');
+    Route::put('menus/{menu}/items/{item}', [MenuController::class, 'updateItem'])->name('menus.items.update');
+    Route::delete('menus/{menu}/items/{item}', [MenuController::class, 'destroyItem'])->name('menus.items.destroy');
+    Route::post('menus/{menu}/reorder', [MenuController::class, 'reorderItems'])->name('menus.reorder');
+
+    Route::resource('banners', BannerController::class)->except(['show']);
 
     Route::resource('leads', LeadController::class)->only(['index', 'show', 'update', 'destroy']);
 
