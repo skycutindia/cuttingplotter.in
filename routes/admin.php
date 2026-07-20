@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\ProductBulkController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::resource('products', ProductController::class);
     Route::post('products/{id}/clone', [ProductController::class, 'clone'])->name('products.clone');
+    Route::get('products-bulk', [ProductBulkController::class, 'index'])->name('products.bulk');
+    Route::get('products-export', [ProductBulkController::class, 'export'])->name('products.export');
+    Route::post('products-export-selected', [ProductBulkController::class, 'exportSelected'])->name('products.export-selected');
+    Route::post('products-import', [ProductBulkController::class, 'import'])->name('products.import');
+    Route::get('products-template', [ProductBulkController::class, 'template'])->name('products.template');
+    Route::post('products-bulk-update', [ProductBulkController::class, 'bulkUpdate'])->name('products.bulk-update');
 
     Route::resource('brands', BrandController::class)->except(['show']);
     Route::resource('categories', CategoryController::class)->except(['show']);

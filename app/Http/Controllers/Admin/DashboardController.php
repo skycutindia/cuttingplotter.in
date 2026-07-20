@@ -7,6 +7,7 @@ use App\Models\Blog;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Lead;
+use App\Models\Media;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\User;
@@ -22,6 +23,7 @@ class DashboardController extends Controller
             'categories' => Category::count(),
             'blogs' => Blog::count(),
             'pages' => Page::count(),
+            'media' => Media::count(),
             'leads' => Lead::count(),
             'new_leads' => Lead::where('status', 'new')->count(),
             'customers' => User::role('customer')->count(),
