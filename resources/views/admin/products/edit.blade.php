@@ -32,7 +32,7 @@
                 <div class="card-header bg-white"><h6 class="mb-0">Organization</h6></div>
                 <div class="card-body">
                     <div class="mb-3"><label class="form-label">Brand</label><select name="brand_id" class="form-select"><option value="">Select Brand</option>@foreach($brands as $brand)<option value="{{ $brand->id }}" @selected($product->brand_id == $brand->id)>{{ $brand->name }}</option>@endforeach</select></div>
-                    <div class="mb-3"><label class="form-label">Category</label><select name="category_id" class="form-select"><option value="">Select Category</option>@foreach($categories as $cat)<option value="{{ $cat->id }}" @selected($product->category_id == $cat->id)>{{ $cat->name }}</option>@endforeach</select></div>
+                    <div class="mb-3"><label class="form-label">Category</label><select name="category_id" class="form-select"><option value="">Select Category</option>@foreach($categories as $cat)<option value="{{ $cat->id }}" @selected($product->category_id == $cat->id)>{{ $cat->parent ? $cat->parent->name.' / '.$cat->name : $cat->name }}</option>@endforeach</select></div>
                 </div>
             </div>
             <div class="card mb-3">

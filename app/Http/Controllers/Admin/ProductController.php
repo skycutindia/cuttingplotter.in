@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Category;
-use App\Services\ProductService;
 use App\Repositories\ProductRepository;
+use App\Services\ProductService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -73,9 +73,37 @@ class ProductController extends Controller
     public function edit(int $id): View
     {
         $product = $this->repository->find($id);
+        abort_unless($product, 404);
         $product->load(['images', 'specifications', 'brand', 'category']);
-        $brands = Brand::where('is_active', true)->orderBy('name')->get();
-        $categories = Category::whereNull('parent_id')->with('children')->orderBy('name')->get();
+
+        // The empty placeholder is the browser's default selection. Keep the
+        // product's current brand and category in the lists, or a routine save
+        // submits blank ids and clears them. Inactive brands and child
+        // categories (assigned by import) are the cases that drop out.
+        $brands = Brand::withTrashed()
+            ->where(function ($query) use ($product) {
+                $query->where(function ($query) {
+                    $query->where('is_active', true)->whereNull('deleted_at');
+                });
+                if ($product->brand_id) {
+                    $query->orWhere('id', $product->brand_id);
+                }
+            })
+            ->orderBy('name')
+            ->get();
+
+        $categories = Category::withTrashed()
+            ->where(function ($query) use ($product) {
+                $query->where(function ($query) {
+                    $query->whereNull('parent_id')->whereNull('deleted_at');
+                });
+                if ($product->category_id) {
+                    $query->orWhere('id', $product->category_id);
+                }
+            })
+            ->with('parent')
+            ->orderBy('name')
+            ->get();
 
         return view('admin.products.edit', compact('product', 'brands', 'categories'));
     }
