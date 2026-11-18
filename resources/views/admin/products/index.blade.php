@@ -27,6 +27,7 @@
             <button type="submit" formaction="{{ route('admin.products.bulk-update') }}" name="action" value="delete" class="btn btn-sm btn-outline-danger" onclick="return requireSelection() && confirm('Delete selected products?')">Delete</button>
         </div>
     </div>
+</form>
 
     <div class="card">
         <div class="table-responsive">
@@ -40,7 +41,7 @@
                 <tbody>
                     @foreach($products as $product)
                     <tr>
-                        <td><input type="checkbox" name="ids[]" value="{{ $product->id }}" class="form-check-input product-check"></td>
+                        <td><input type="checkbox" name="ids[]" value="{{ $product->id }}" class="form-check-input product-check" form="bulk-form"></td>
                         <td>
                             <strong>{{ $product->name }}</strong>
                             @if($product->is_featured)<span class="badge bg-warning text-dark ms-1">Featured</span>@endif
@@ -72,7 +73,6 @@
         </div>
         <div class="card-footer">{{ $products->links() }}</div>
     </div>
-</form>
 @endsection
 
 @push('scripts')
