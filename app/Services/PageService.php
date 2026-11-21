@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Page;
 use App\Models\PageSection;
+use App\Support\Slugs;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -11,9 +12,10 @@ class PageService
 {
     public function create(array $data): Page
     {
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']);
-        }
+        $data['slug'] = Slugs::unique(
+            Page::class,
+            ! empty($data['slug']) ? $data['slug'] : (Str::slug($data['title'] ?? '') ?: 'page')
+        );
 
         if (! empty($data['is_homepage'])) {
             Page::query()->update(['is_homepage' => false]);
@@ -24,6 +26,14 @@ class PageService
 
     public function update(Page $page, array $data): Page
     {
+        if (array_key_exists('slug', $data) && blank($data['slug'])) {
+            $data['slug'] = Slugs::unique(
+                Page::class,
+                Str::slug($data['title'] ?? $page->title) ?: 'page',
+                $page->id
+            );
+        }
+
         if (! empty($data['is_homepage'])) {
             Page::query()->where('id', '!=', $page->id)->update(['is_homepage' => false]);
         }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Support\Slugs;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -37,7 +38,7 @@ class BrandController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        $validated['slug'] = Slugs::unique(Brand::class, Str::slug($validated['name']) ?: 'brand');
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active', true);
 

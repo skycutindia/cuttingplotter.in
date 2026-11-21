@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductSpecification;
 use App\Repositories\ProductRepository;
+use App\Support\Slugs;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -17,9 +18,10 @@ class ProductService
     public function create(array $data, array $images = [], array $specifications = []): Product
     {
         return DB::transaction(function () use ($data, $images, $specifications) {
-            if (empty($data['slug'])) {
-                $data['slug'] = Str::slug($data['name']);
-            }
+            $data['slug'] = Slugs::unique(
+                Product::class,
+                ! empty($data['slug']) ? $data['slug'] : (Str::slug($data['name'] ?? '') ?: 'product')
+            );
 
             $product = $this->repository->create($data);
             $this->syncImages($product, $images);
