@@ -72,11 +72,34 @@ class MediaService
 
     public function replace(Media $media, UploadedFile $file, bool $convertWebp = true): Media
     {
-        $folder = $media->folder;
-        $altText = $media->alt_text;
-        $this->delete($media);
+        $disk = Storage::disk($media->disk ?: 'public');
+        $path = $media->path;
+        $mime = $file->getMimeType() ?: 'application/octet-stream';
+        $isImage = in_array($mime, $this->imageMimes, true);
+        $storedAsWebp = str_ends_with(strtolower($path), '.webp');
 
-        return $this->upload($file, $folder, $convertWebp, $altText);
+        // Keep the public path. Callers paste this URL into pages and products,
+        // and deleting the row first drops the file if encoding then fails.
+        if ($isImage && $convertWebp && $storedAsWebp) {
+            $image = Image::decodePath($file->getRealPath());
+            $encoded = $image->encodeUsingMediaType('image/webp', quality: 82);
+            $disk->put($path, (string) $encoded);
+            $mime = 'image/webp';
+        } else {
+            $stream = fopen($file->getRealPath(), 'r');
+            $disk->put($path, $stream);
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+        }
+
+        $media->update([
+            'mime_type' => $mime,
+            'size' => $disk->size($path),
+            'file_name' => basename($path),
+        ]);
+
+        return $media->fresh();
     }
 
     public function folders(): array
