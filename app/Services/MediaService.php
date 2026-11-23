@@ -6,18 +6,38 @@ use App\Models\Media;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Intervention\Image\Laravel\Facades\Image;
 
 class MediaService
 {
-    protected array $imageMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'];
+    protected array $imageMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/x-ms-bmp'];
+
+    /** Extensions written to the public disk. Active content types are rejected. */
+    public const ALLOWED_EXTENSIONS = [
+        'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',
+        'pdf', 'zip', 'xlsx', 'xls', 'doc', 'docx',
+        'mp4', 'webm', 'mov',
+    ];
+
+    protected array $blockedMimes = [
+        'text/html',
+        'application/xhtml+xml',
+        'image/svg+xml',
+        'application/javascript',
+        'text/javascript',
+        'application/x-httpd-php',
+        'application/x-php',
+        'text/x-php',
+        'application/php',
+    ];
 
     public function upload(UploadedFile $file, ?string $folder = null, bool $convertWebp = true, ?string $altText = null): Media
     {
-        $folder = $folder ?: 'uploads';
+        $folder = $this->safeFolder($folder);
+        $extension = $this->guardedExtension($file);
         $originalName = $file->getClientOriginalName();
         $mime = $file->getMimeType();
-        $extension = $file->getClientOriginalExtension();
         $baseName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME)).'-'.Str::random(6);
 
         $isImage = in_array($mime, $this->imageMimes, true);
@@ -32,7 +52,8 @@ class MediaService
             $mime = 'image/webp';
         } else {
             $fileName = $baseName.'.'.$extension;
-            $path = $file->storeAs($folder, $fileName, 'public');
+            $path = $folder.'/'.$fileName;
+            Storage::disk('public')->putFileAs($folder, $file, $fileName);
             $size = $file->getSize();
         }
 
@@ -72,6 +93,9 @@ class MediaService
 
     public function replace(Media $media, UploadedFile $file, bool $convertWebp = true): Media
     {
+        // Reject a disallowed replacement before the original file is removed.
+        $this->guardedExtension($file);
+
         $folder = $media->folder;
         $altText = $media->alt_text;
         $this->delete($media);
@@ -92,8 +116,43 @@ class MediaService
 
     public function createFolder(string $folder): void
     {
-        $folder = trim(str_replace(['..', '\\'], '', $folder), '/');
-        Storage::disk('public')->makeDirectory($folder);
+        Storage::disk('public')->makeDirectory($this->safeFolder($folder));
+    }
+
+    /**
+     * Keep the client extension only when it is on the public-disk allowlist
+     * and the detected type is not HTML, SVG, or PHP. The stored name never
+     * reuses a dangerous extension such as .php or .html.
+     */
+    public function guardedExtension(UploadedFile $file): string
+    {
+        $extension = strtolower($file->getClientOriginalExtension());
+        $mime = strtolower((string) $file->getMimeType());
+
+        if (! in_array($extension, self::ALLOWED_EXTENSIONS, true) || $this->mimeIsBlocked($mime)) {
+            throw ValidationException::withMessages([
+                'files' => 'This file type is not allowed. Upload an image, PDF, ZIP, Office document, or video.',
+            ]);
+        }
+
+        return $extension === 'jpeg' ? 'jpg' : $extension;
+    }
+
+    protected function mimeIsBlocked(string $mime): bool
+    {
+        return $mime === ''
+            || in_array($mime, $this->blockedMimes, true)
+            || str_contains($mime, 'php')
+            || str_contains($mime, 'html')
+            || str_contains($mime, 'javascript')
+            || str_contains($mime, 'svg');
+    }
+
+    protected function safeFolder(?string $folder): string
+    {
+        $folder = trim(str_replace(['..', '\\'], '', (string) ($folder ?: 'uploads')), '/');
+
+        return $folder !== '' ? $folder : 'uploads';
     }
 
     public function paginate(array $filters = [], int $perPage = 24)

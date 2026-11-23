@@ -26,7 +26,7 @@ class MediaController extends Controller
     {
         $request->validate([
             'files' => 'required|array|min:1',
-            'files.*' => 'file|max:20480',
+            'files.*' => 'file|max:20480|extensions:'.implode(',', MediaService::ALLOWED_EXTENSIONS),
             'folder' => 'nullable|string|max:100',
             'convert_webp' => 'boolean',
         ]);
@@ -69,7 +69,7 @@ class MediaController extends Controller
     public function replace(Request $request, Media $medium): RedirectResponse
     {
         $request->validate([
-            'file' => 'required|file|max:20480',
+            'file' => 'required|file|max:20480|extensions:'.implode(',', MediaService::ALLOWED_EXTENSIONS),
             'convert_webp' => 'boolean',
         ]);
 
