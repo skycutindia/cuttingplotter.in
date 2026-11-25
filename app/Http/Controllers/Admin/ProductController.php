@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Category;
-use App\Services\ProductService;
 use App\Repositories\ProductRepository;
+use App\Services\ProductService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -45,6 +45,7 @@ class ProductController extends Controller
             'subcategory_id' => 'nullable|exists:categories,id',
             'short_description' => 'nullable|string',
             'description' => 'nullable|string',
+            'product_code' => 'nullable|string|max:255',
             'price' => 'nullable|numeric|min:0',
             'offer_price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
@@ -60,6 +61,7 @@ class ProductController extends Controller
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active', true);
         $validated['features'] = array_filter($request->input('features', []));
+        $validated = $this->normalizeStock($validated);
 
         $this->service->create(
             $validated,
@@ -90,6 +92,7 @@ class ProductController extends Controller
             'subcategory_id' => 'nullable|exists:categories,id',
             'short_description' => 'nullable|string',
             'description' => 'nullable|string',
+            'product_code' => 'nullable|string|max:255',
             'price' => 'nullable|numeric|min:0',
             'offer_price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
@@ -102,6 +105,7 @@ class ProductController extends Controller
 
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active');
+        $validated = $this->normalizeStock($validated);
 
         $this->service->update($id, $validated, $request->file('images', []), $request->input('specifications', []));
 
@@ -120,5 +124,20 @@ class ProductController extends Controller
         $product = $this->service->clone($id);
 
         return redirect()->route('admin.products.edit', $product->id)->with('success', 'Product cloned successfully.');
+    }
+
+    /**
+     * Stock is NOT NULL. An empty input arrives as null and would abort the save.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function normalizeStock(array $data): array
+    {
+        if (array_key_exists('stock', $data) && $data['stock'] === null) {
+            $data['stock'] = 0;
+        }
+
+        return $data;
     }
 }
