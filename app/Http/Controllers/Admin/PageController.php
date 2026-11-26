@@ -45,7 +45,7 @@ class PageController extends Controller
         ]);
 
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['title']);
-        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_active'] = $request->boolean('is_active');
         $validated['is_homepage'] = $request->boolean('is_homepage');
 
         $page = $this->pageService->create($validated);
@@ -116,7 +116,7 @@ class PageController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_active'] = $request->boolean('is_active');
 
         $this->pageService->updateSection($section, $validated);
 

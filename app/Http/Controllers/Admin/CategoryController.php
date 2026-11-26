@@ -40,7 +40,7 @@ class CategoryController extends Controller
 
         $validated['slug'] = Str::slug($validated['name']);
         $validated['is_featured'] = $request->boolean('is_featured');
-        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_active'] = $request->boolean('is_active');
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('categories', 'public');

@@ -35,7 +35,7 @@ class SeoController extends Controller
         ]);
 
         $validated['from_url'] = '/'.ltrim($validated['from_url'], '/');
-        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_active'] = $request->boolean('is_active');
 
         Redirect::create($validated);
 

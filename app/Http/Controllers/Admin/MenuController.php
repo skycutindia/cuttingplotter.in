@@ -61,7 +61,7 @@ class MenuController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_active'] = $request->boolean('is_active');
         $item->update($validated);
         $this->menuService->clearCache($menu->location);
 

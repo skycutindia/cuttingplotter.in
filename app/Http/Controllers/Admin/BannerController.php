@@ -40,7 +40,7 @@ class BannerController extends Controller
             $validated['mobile_image'] = $request->file('mobile_image')->store('banners', 'public');
         }
 
-        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_active'] = $request->boolean('is_active');
         Banner::create($validated);
 
         return redirect()->route('admin.banners.index')->with('success', 'Banner created.');

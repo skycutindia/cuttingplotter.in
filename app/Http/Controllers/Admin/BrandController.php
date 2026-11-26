@@ -39,7 +39,7 @@ class BrandController extends Controller
 
         $validated['slug'] = Str::slug($validated['name']);
         $validated['is_featured'] = $request->boolean('is_featured');
-        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_active'] = $request->boolean('is_active');
 
         if ($request->hasFile('logo')) {
             $validated['logo'] = $request->file('logo')->store('brands', 'public');
